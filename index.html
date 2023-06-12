@@ -7,7 +7,7 @@
     <!--Font Awesome CDN-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
     <!--Stylesheet-->
-    <link rel="stylesheet" src="style.css" href="style.css">
+    <link rel="stylesheet" src="styles.css" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -20,6 +20,73 @@
         <div id="tasks"></div>
     </div>
     <!--Script-->
-    <script src="script.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+		document.querySelector('#push').onclick = function(){
+    if(document.querySelector('#newtask input').value.length == 0){
+        alert("Please Enter a Task")
+    }
+    else{
+
+		fetch('./tasks.json')
+        .then((response) => {
+			responseClone = response.clone();
+			return response.json()
+		}).then((tasks) => {
+            var html = '';
+            for (var i = 0; i < tasks.length; i++) {
+                html += "<div class='task-tile' id='task-tile'>" +
+                    "<h2 class='task-h2'>" + tasks[i].description + "</h2>" +"</div>";
+            }
+            document.querySelector('#tasks').innerHTML += html;
+        }, function (reject) {
+			console.log('Error parsing JSON from response:', reject, responseClone); 
+			responseClone.text()
+			.then(function (bodyText) {
+				console.log('Received the following instead of valid JSON:', bodyText);
+			})
+		});
+		
+        document.querySelector('#tasks').innerHTML += `
+            <div class="task">
+                <span id="taskname">
+                    ${document.querySelector('#newtask input').value}
+                </span>
+                <button class="delete">
+                    <i class="far fa-trash-alt"></i>
+                </button>
+            </div>
+        `;
+
+        var current_tasks = document.querySelectorAll(".delete");
+        for(var i=0; i<current_tasks.length; i++){
+            current_tasks[i].onclick = function(){
+                this.parentNode.remove();
+            }
+        }
+
+        var tasks = document.querySelectorAll(".task");
+        for(var i=0; i<tasks.length; i++){
+            tasks[i].onclick = function(){
+                this.classList.toggle('completed');
+            }
+        }
+
+        document.querySelector("#newtask input").value = "";
+    }
+}
+
+
+const form = document.querySelector('form');
+
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			const formData = new FormData(form);
+			const obj = Object.fromEntries(formData);
+
+			const json = JSON.stringify(obj)
+			
+		});
+	</script>
 </body>
 </html>
